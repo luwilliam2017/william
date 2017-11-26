@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Query Demo</title>
+</head>
+<!--导入jQuery-->
+<script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
+<body>
+
+    姓名:<input type="text" id="name" value=""/>
+    <br><br>
+    <input id="submit" type="button" value="提交">
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <input id="clear" type="button" value="清除">
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <input id="all" type="button" value="查询所有">
+    <script>
+    $("#submit").click(function(){
+        var name = $("#name").val();
+        var html = "<tr><td>编号</td><td>姓名</td><td>电话</td>"
+                 + "<td>邮箱</td><td>年龄</td><td>操作</td></tr>";
+        $.ajax({
+            type: "POST",
+            url : "http://localhost:8012/query/" + name,
+            contentType : "application/json",
+            dataType : 'json',
+            success : function(data){
+                html += "<tr>"
+                      + "<td>" + data.id + "</td>"
+                      + "<td>" + data.username + "</td>"
+                      + "<td>" + data.phone + "</td>"
+                      + "<td>" + data.email + "</td>"
+                      + "<td>" + data.age + "</td>"
+                      + "<td><a onclick=deletePerson("+data.id+")>删除</a></td>"
+                      + "</tr>";
+                $("#info").html(html);
+            }
+        });
+    });
+
+    $("#clear").click(function(){
+        $("#name").val("");
+    });
+
+    $("#all").click(function(){
+        var html = "<tr><td>编号</td><td>姓名</td><td>电话</td>"
+                 + "<td>邮箱</td><td>年龄</td><td>操作</td></tr>";
+        $.ajax({
+            url : "http://localhost:8012/query/all",
+            type : "POST",
+            dataType : "json",
+            success : function(data){
+                for (var i = 0; i < data.length; i++) {
+                    html += "<tr>"
+                          + "<td>" + data[i].id + "</td>"
+                          + "<td>" + data[i].username + "</td>"
+                          + "<td>" + data[i].phone + "</td>"
+                          + "<td>" + data[i].email + "</td>"
+                          + "<td>" + data[i].age + "</td>"
+                          + "<td><a onclick=deletePerson("+data[i].id+")>删除</a></td>"
+                          + "</tr>";
+                }
+                $("#info").html(html);
+            }
+        });
+    });
+
+    function deletePerson(id){
+        alert(id);
+        $.ajax({
+            type : "POST",
+            dataType : "text",
+            url : "http://localhost:8012/query/delete/" + id,
+            success : function(data){
+                if(data == 1) {
+                    alert("删除成功！");
+                } else {
+                    alert("删除失败！");
+                }
+            }
+        })
+    }
+
+</script>
+    <br><br>
+    <table id="info" border="1"></table>
+</body>
+</html>
